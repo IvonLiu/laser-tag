@@ -5,11 +5,13 @@ using Vuforia;
 
 public class TrackableList : MonoBehaviour {
 
-	bool alive = true;
-	bool disabled = false;
+	string urlBase = "https://blooming-waters-11044.herokuapp.com/";
 
-	string myName = "stones";
-	//string myName = "chips";
+	bool alive = true;
+	bool disabled = true;
+
+	//string myName = "stones";
+	string myName = "chips";
 
 	void Start () {
 		Debug.Log ("This is working!");
@@ -43,18 +45,20 @@ public class TrackableList : MonoBehaviour {
 
 	void disable () {
 		disabled = true;
+		GameObject.Find ("Cube").GetComponent<Renderer> ().enabled = true;
 		Debug.Log ("Disabling");
 	}
 
 	void enable () {
 		disabled = false;
+		GameObject.Find ("Cube").GetComponent<Renderer> ().enabled = false;
 		Debug.Log ("Enabling");
 	}
 
 	// Update is called once per frame
 	void Update () {
 
-		WWW wwwCheck = new WWW ("http://localhost:5000/check/" + myName);
+		WWW wwwCheck = new WWW (urlBase + "check/" + myName);
 		StartCoroutine (WaitForCheckRequest (wwwCheck));
 
 		if (!alive) {
@@ -83,7 +87,7 @@ public class TrackableList : MonoBehaviour {
 			if (!string.Equals (myName, tb.TrackableName)) {
 				if (Input.GetButtonDown ("Fire1")) {
 					Debug.Log ("firing at " + tb.TrackableName);
-					WWW wwwShoot = new WWW ("http://localhost:5000/shoot/"+tb.TrackableName);
+					WWW wwwShoot = new WWW (urlBase + "shoot/"+tb.TrackableName);
 					StartCoroutine(WaitForShootRequest(wwwShoot));
 				}
 				Debug.Log ("Trackable!!!!!!!!: " + tb.TrackableName);
