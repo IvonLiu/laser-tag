@@ -5,30 +5,69 @@ using Vuforia;
 
 public class TrackableList : MonoBehaviour {
 
+	bool alive = true;
+	bool disabled = false;
+
 	string myName = "stones";
 	//string myName = "chips";
 
 	void Start () {
 		Debug.Log ("This is working!");
-		WWW www = new WWW ("http://localhost:5000/");
-		StartCoroutine(WaitForRequest(www));
-		WWW ww2 = new WWW ("http://localhost:5000/test");
-		StartCoroutine (WaitForRequest (ww2));
 	}
 		
-	IEnumerator WaitForRequest(WWW www) {
+	IEnumerator WaitForCheckRequest(WWW www) {
 		yield return www;
 
 		// check for errors
 		if (www.error == null) {
-			Debug.Log("WWW Ok!: " + www.data);
+			if (string.Equals (www.text, "true")) {	// returns true if you've been shot
+				alive = false;
+			} else {
+				alive = true;
+			}
 		} else {
-			Debug.Log("WWW Error: "+ www.error);
+			Debug.Log("Check WWW Error: "+ www.error);
 		}    
+	}
+
+	IEnumerator WaitForShootRequest(WWW www) {
+		yield return www;
+
+		// check for errors
+		if (www.error == null) {
+			Debug.Log("Shoot WWW Ok!: " + www.data);
+		} else {
+			Debug.Log("Shoot WWW Error: "+ www.error);
+		} 
+	}
+
+	void disable () {
+		disabled = true;
+		Debug.Log ("Disabling");
+	}
+
+	void enable () {
+		disabled = false;
+		Debug.Log ("Enabling");
 	}
 
 	// Update is called once per frame
 	void Update () {
+
+		WWW wwwCheck = new WWW ("http://localhost:5000/check/" + myName);
+		StartCoroutine (WaitForCheckRequest (wwwCheck));
+
+		if (!alive) {
+			if (!disabled) {
+				disable ();
+			}
+			return;
+		} else {
+			if (disabled) {
+				enable ();
+			}
+		}
+
 		//Debug.Log ("Starting something hello world!!");
 		// Get the Vuforia StateManager
 		StateManager sm = TrackerManager.Instance.GetStateManager ();
@@ -44,6 +83,8 @@ public class TrackableList : MonoBehaviour {
 			if (!string.Equals (myName, tb.TrackableName)) {
 				if (Input.GetButtonDown ("Fire1")) {
 					Debug.Log ("firing at " + tb.TrackableName);
+					WWW wwwShoot = new WWW ("http://localhost:5000/shoot/"+tb.TrackableName);
+					StartCoroutine(WaitForShootRequest(wwwShoot));
 				}
 				Debug.Log ("Trackable!!!!!!!!: " + tb.TrackableName);
 			}
