@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using Vuforia;
 
@@ -9,6 +10,21 @@ public class TrackableList : MonoBehaviour {
 
 	void Start () {
 		Debug.Log ("This is working!");
+		WWW www = new WWW ("http://localhost:5000/");
+		StartCoroutine(WaitForRequest(www));
+		WWW ww2 = new WWW ("http://localhost:5000/test");
+		StartCoroutine (WaitForRequest (ww2));
+	}
+		
+	IEnumerator WaitForRequest(WWW www) {
+		yield return www;
+
+		// check for errors
+		if (www.error == null) {
+			Debug.Log("WWW Ok!: " + www.data);
+		} else {
+			Debug.Log("WWW Error: "+ www.error);
+		}    
 	}
 
 	// Update is called once per frame
