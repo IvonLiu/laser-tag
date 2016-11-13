@@ -89,3 +89,5 @@ __pycache__/
 #gradle.properties
 *.iml
 out/
+
+.ipynb_checkpoints
